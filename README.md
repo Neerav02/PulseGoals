@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="./apps/web/public/3d_dashboard_hero.png" alt="PulseGoals Hero" width="100%" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);" />
-
   <h1>🫀 PulseGoals</h1>
   <p><strong>Intelligent Performance Management & Goal Setting Portal</strong></p>
   <p><em>Built exclusively for the AtomQuest Hackathon 1.0</em></p>
