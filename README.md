@@ -57,16 +57,61 @@ While we successfully implemented 100% of the required business logic from the B
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ System Architecture & Workflow
 
 PulseGoals utilizes a modern, decoupled **Monorepo** architecture designed for massive scalability, low API latency, and maximum cost optimization.
 
+### 1. High-Level Architecture Diagram
 ```mermaid
 graph TD
-    A[Employee / Manager] -->|HTTPS| B(React + Vite SPA)
-    B -->|REST API| C{Node.js + Express Backend}
-    C -->|Prisma ORM| D[(PostgreSQL Database)]
-    C <-->|JSON Payload| E[xAI Grok Integration]
+    subgraph Client Layer
+        A[Web Browser] -->|Renders| B(React + Vite SPA)
+    end
+    
+    subgraph Network Layer
+        B -->|HTTPS / REST API| C[Express Router]
+        C -->|JWT Auth Guards| D{Node.js Services}
+    end
+    
+    subgraph Data & AI Layer
+        D -->|Prisma ORM| E[(PostgreSQL Database)]
+        D <-->|JSON Payload| F[xAI Grok API]
+    end
+
+    classDef client fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef network fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef data fill:#dfd,stroke:#333,stroke-width:2px;
+    class B client;
+    class C,D network;
+    class E,F data;
+```
+
+### 2. User Workflow Journey
+```mermaid
+sequenceDiagram
+    actor Employee
+    actor Manager
+    participant App as React Frontend
+    participant AI as Grok AI Engine
+    participant DB as PostgreSQL
+
+    Employee->>App: Creates Goal Draft
+    App->>AI: Sends Goal Description
+    AI-->>App: Returns "SMART" Suggestions
+    Employee->>App: Finalizes & Submits Goal Sheet
+    App->>DB: Updates Status to SUBMITTED
+    App-->>Manager: 📧 Trigger Mock Toast Notification
+    
+    Manager->>App: Reviews Goal Sheet
+    alt Needs Changes
+        Manager->>App: Returns for Rework
+        App->>DB: Updates Status to REWORK
+        App-->>Employee: 📧 Notification Sent
+    else Approved
+        Manager->>App: Approves & Locks Sheet
+        App->>DB: Updates Status to APPROVED
+        App-->>Employee: 📧 Final Approval Notification
+    end
 ```
 
 ### 📂 Folder Structure
