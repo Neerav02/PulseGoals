@@ -116,23 +116,25 @@ sequenceDiagram
 
 ### 📂 Folder Structure
 ```text
-pulsegoals/
-├── apps/
-│   ├── api/                  # 🟢 Backend Microservice
-│   │   ├── prisma/           # PostgreSQL Schema (schema.prisma)
-│   │   ├── routes/           # REST Endpoints (Auth, Goals, Analytics)
-│   │   ├── middleware/       # JWT Auth Guards & RBAC
-│   │   └── server.js         # Express Entry Point
-│   │
-│   └── web/                  # 🔵 Frontend SPA
-│       ├── public/           # Static Assets (3D models, SVG Favicons)
-│       ├── src/
-│       │   ├── components/   # Reusable UI (Sidebar, Layouts)
-│       │   ├── hooks/        # Context APIs (useAuth)
-│       │   ├── lib/          # Axios Interceptors & Validation Constants
-│       │   └── pages/        # Route Components (Landing, Dashboard)
-│       └── index.css         # Custom Design System Variables
-└── package.json              # Monorepo Workspace Config
+📦 pulsegoals
+ ┣ 📂 apps
+ ┃ ┣ 📂 api (Node.js/Express Backend)
+ ┃ ┃ ┣ 📂 prisma          # ORM Schema & Migrations
+ ┃ ┃ ┣ 📂 routes          # REST API Controllers (Goals, Auth, Analytics)
+ ┃ ┃ ┣ 📂 services        # Business Logic & xAI Integration
+ ┃ ┃ ┣ 📂 middleware      # RBAC Auth Guards & JWT Verification
+ ┃ ┃ ┗ 📜 server.js       # Express Application Entry
+ ┃ ┗ 📂 web (React/Vite Frontend)
+ ┃   ┣ 📂 public          # Static 3D Assets & Graphics
+ ┃   ┣ 📂 src
+ ┃   ┃ ┣ 📂 components    # Reusable Glassmorphic UI Library
+ ┃   ┃ ┣ 📂 hooks         # Custom React State Management
+ ┃   ┃ ┣ 📂 lib           # API Interceptors & Constants
+ ┃   ┃ ┣ 📂 pages         # Role-based Route Views (Admin, Manager, Employee)
+ ┃   ┃ ┗ 📜 App.jsx       # App Routing & Notification Context
+ ┃   ┗ 📜 index.css       # Global Design System Variables
+ ┣ 📜 package.json        # NPM Workspace Configuration
+ ┗ 📜 README.md           # Project Documentation
 ```
 
 ---
