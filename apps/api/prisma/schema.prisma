@@ -1,0 +1,189 @@
+// PulseGoals - Prisma Schema
+// Database: PostgreSQL via Supabase
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum UomType {
+  MIN
+  MAX
+  TIMELINE
+  ZERO
+}
+
+enum GoalStatus {
+  NOT_STARTED
+  ON_TRACK
+  COMPLETED
+}
+
+enum SheetStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REWORK
+}
+
+enum Quarter {
+  Q1
+  Q2
+  Q3
+  Q4
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  password      String
+  role          Role           @default(EMPLOYEE)
+  department    String
+  designation   String         @default("")
+  managerId     String?
+  manager       User?          @relation("Reports", fields: [managerId], references: [id])
+  reportees     User[]         @relation("Reports")
+  goalSheets    GoalSheet[]
+  checkIns      CheckIn[]      @relation("ManagerCheckIns")
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("users")
+}
+
+model GoalSheet {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  cycleYear   Int
+  status      SheetStatus @default(DRAFT)
+  goals       Goal[]
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  approvedBy  String?
+  reworkNote  String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([userId, cycleYear])
+  @@map("goal_sheets")
+}
+
+model Goal {
+  id           String        @id @default(cuid())
+  goalSheetId  String
+  goalSheet    GoalSheet     @relation(fields: [goalSheetId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  thrustArea   String
+  uomType      UomType
+  target       String
+  weightage    Float
+  isShared     Boolean       @default(false)
+  sharedFromId String?
+  achievements Achievement[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("goals")
+}
+
+model Achievement {
+  id            String     @id @default(cuid())
+  goalId        String
+  goal          Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  quarter       Quarter
+  actualValue   String
+  status        GoalStatus @default(NOT_STARTED)
+  progressScore Float?
+  submittedAt   DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([goalId, quarter])
+  @@map("achievements")
+}
+
+model CheckIn {
+  id         String   @id @default(cuid())
+  managerId  String
+  manager    User     @relation("ManagerCheckIns", fields: [managerId], references: [id])
+  employeeId String
+  quarter    Quarter
+  comment    String
+  createdAt  DateTime @default(now())
+
+  @@map("check_ins")
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorId     String
+  actorName   String
+  action      String
+  entityType  String
+  entityId    String
+  beforeValue Json?
+  afterValue  Json?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model CycleConfig {
+  id        String   @id @default(cuid())
+  phase     String   @unique
+  label     String
+  isOpen    Boolean  @default(false)
+  openedAt  DateTime?
+  closedAt  DateTime?
+  openedBy  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cycle_configs")
+}
+
+model SharedGoal {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  thrustArea  String
+  uomType     UomType
+  target      String
+  department  String
+  createdBy   String
+  assignedTo  String[] // array of user IDs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("shared_goals")
+}
